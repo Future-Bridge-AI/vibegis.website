@@ -1,0 +1,29 @@
+# VibeGIS - AI-Powered ArcGIS Widget Generator
+
+## Project Overview
+SaaS product that guides GIS developers through building custom ArcGIS Experience Builder widgets using BMAD methodology (Business → Manage → Architect → Develop). AI agents walk users from idea to production-ready, downloadable widget code.
+
+## Target Users
+- Experienced GIS developers wanting AI acceleration  
+- Non-technical users building simple map applications
+- Agencies and enterprise teams doing ExB development
+
+## Brand Identity & Design System
+**Aesthetic:** Technical Brutalism meets Cyberpunk GIS - "GeoPunk"
+
+**Philosophy:** 
+- Anti-establishment selling to the establishment
+- "If not us, it'll be Big AI - we're taking you with us"
+- Balance: Yin/Yang, Natural/Artificial, Focus/Fun
+
+**Visual Language:**
+- Dark mode primary (#0a0e17 background)
+- Neon accents: Cyan (#00ffff), Purple (#8b5cf6), Pink (#ec4899)
+- Animated coordinate grids as background elements
+- Typography: Inter (body), JetBrains Mono (code/technical)
+- Gradient glows and sharp borders
+- Card-based layouts with subtle neon borders
+
+**Reference:** See `vibegis-landing.jsx` for design foundation
+
+## Tech Stack
