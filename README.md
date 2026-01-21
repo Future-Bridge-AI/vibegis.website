@@ -2,37 +2,7 @@
 
 SaaS product that guides GIS developers through building custom ArcGIS Experience Builder widgets using BMAD methodology (Business → Manage → Architect → Develop).
 
-## Tech Stack
-
-- **React 19** - UI framework
-- **TypeScript** - Type safety
-- **Vite** - Build tool
-- **Tailwind CSS** - Styling with GeoPunk design system
-- **React Router** - Client-side routing
-- **Supabase** - Backend (auth, database)
-- **Anthropic API** - AI agents
-
-## Project Structure
-
-```
-src/
-├── app/              # Authenticated app (dashboard, widget generator)
-├── marketing/        # Public marketing pages
-├── components/       # Shared components
-├── lib/              # Utilities & configs (Supabase, constants)
-├── hooks/            # Custom React hooks
-├── types/            # TypeScript types
-└── styles/           # Global styles
-```
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js 18+ 
-- npm/yarn/pnpm
-
-### Installation
+## Quick Start
 
 ```bash
 # Install dependencies
@@ -46,13 +16,65 @@ cp .env.example .env
 npm run dev
 ```
 
+Open [http://localhost:3000](http://localhost:3000) to view the app.
+
+## Routes
+
+| Route | Description |
+|-------|-------------|
+| `/` | Landing page |
+| `/generator` | BMAD Widget Generator wizard |
+
+## Tech Stack
+
+- **React 19** - UI framework
+- **TypeScript** - Type safety (strict mode)
+- **Vite** - Build tool
+- **Tailwind CSS** - Styling with GeoPunk design system
+- **Zustand** - State management
+- **React Router** - Client-side routing
+- **Monaco Editor** - Code display
+- **JSZip** - Widget packaging
+- **Supabase** - Backend (auth, database)
+- **Anthropic API** - AI agents
+
+## Project Structure
+
+```
+src/
+├── app/                    # Application routes
+│   └── generator/          # BMAD widget generator
+├── features/               # Feature modules
+│   └── workflow/           # BMAD workflow (types, store, phases)
+├── marketing/              # Public marketing pages
+├── components/             # Shared components
+│   └── ui/                 # UI components (StepIndicator)
+├── lib/                    # Core utilities
+│   ├── generator/          # Widget code generation
+│   ├── anthropic.ts        # Claude API client
+│   └── supabase.ts         # Supabase client
+├── hooks/                  # Custom React hooks
+├── types/                  # TypeScript types
+└── styles/                 # Global styles
+```
+
+## BMAD Workflow
+
+The widget generator follows a 4-phase workflow:
+
+1. **Analyze** - Capture widget concept, audience, and data sources
+2. **Specify** - Define functional requirements and UI expectations
+3. **Architect** - Plan component structure and integrations
+4. **Generate** - Produce downloadable widget code package
+
+See [docs/BMAD-WORKFLOW.md](docs/BMAD-WORKFLOW.md) for detailed methodology.
+
 ## Design System
 
 **GeoPunk Aesthetic:**
-- Dark navy backgrounds (`#0a0e17`)
-- Neon cyan/purple/pink accents
-- Animated coordinate grids
-- Inter + JetBrains Mono fonts
+- Dark backgrounds: `#0a0e17` (geodark)
+- Neon accents: Cyan `#00D9D5`, Pink `#FF006E`, Orange `#FF6B35`
+- Fonts: Orbitron (headings), IBM Plex Mono (body)
 - Technical brutalism meets cyberpunk GIS
 
 See `tailwind.config.js` for full color palette and utilities.
@@ -66,6 +88,20 @@ See `tailwind.config.js` for full color palette and utilities.
 - `@lib/` → `src/lib/`
 - `@hooks/` → `src/hooks/`
 - `@types/` → `src/types/`
+
+## Commands
+
+```bash
+npm run dev       # Start dev server on port 3000
+npm run build     # TypeScript check + Vite build
+npm run lint      # ESLint with zero warnings tolerance
+npm run preview   # Preview production build
+```
+
+## Documentation
+
+- [BMAD Workflow](docs/BMAD-WORKFLOW.md) - Methodology explanation
+- [Architecture](docs/ARCHITECTURE.md) - Project structure
 
 ## License
 

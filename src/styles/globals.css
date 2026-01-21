@@ -40,6 +40,19 @@
   .glow-purple {
     box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
   }
+
+  /* Wizard form utilities */
+  .wizard-input {
+    @apply rounded-xl border border-wizard-border bg-wizard-card/80 px-4 py-3 text-sm text-slate-100 placeholder:text-slate-500 focus:border-fiesta-turquoise/70 focus:outline-none;
+  }
+
+  .wizard-card {
+    @apply rounded-2xl border border-wizard-border bg-wizard-card/60 p-6;
+  }
+
+  .wizard-section-title {
+    @apply text-xs font-semibold uppercase tracking-[0.3em] text-fiesta-turquoise;
+  }
 }
 
 @layer components {

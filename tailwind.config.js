@@ -12,6 +12,17 @@ export default {
           pink: '#FF006E',
           orange: '#FF6B35',
         },
+        geodark: {
+          DEFAULT: '#0a0e17',
+          secondary: '#1a1f2e',
+          tertiary: '#0f1419',
+        },
+        wizard: {
+          bg: '#0a0e17',
+          card: '#1a1f2e',
+          border: '#334155',
+          accent: '#00ffff',
+        },
       },
       fontFamily: {
         sans: ['Orbitron', 'sans-serif'],
@@ -21,6 +32,8 @@ export default {
         'glow-turquoise': '0 0 40px rgba(0, 217, 213, 0.6)',
         'glow-pink': '0 0 40px rgba(255, 0, 110, 0.6)',
         'glow-orange': '0 0 40px rgba(255, 107, 53, 0.6)',
+        'wizard-card': '0 20px 80px rgba(8, 15, 32, 0.6)',
+        'wizard-glow': '0 0 30px rgba(0, 217, 213, 0.3)',
       },
       animation: {
         'shimmer': 'shimmer 3s infinite',
