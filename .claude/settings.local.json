@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell -Command \"Get-Content .cursorrules -Raw\")",
+      "Bash(powershell -Command \"\\(Get-Content .cursorrules -Raw\\).Length; Get-Content .cursorrules\")",
+      "Bash(powershell -Command \"Get-ChildItem -File | ForEach-Object { $_Name }\")",
+      "Bash(dir \"C:\\\\Users\\\\Craig\\\\FBAI_VibeGIS_Development\\\\vibegis.website\")",
+      "Bash(tree:*)",
+      "Bash(ls:*)",
+      "Bash(npm run build:*)",
+      "Skill(session-end)",
+      "Bash(git add:*)"
+    ]
+  }
+}
