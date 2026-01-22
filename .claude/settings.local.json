@@ -1,15 +1,34 @@
 {
   "permissions": {
     "allow": [
-      "Bash(powershell -Command \"Get-Content .cursorrules -Raw\")",
-      "Bash(powershell -Command \"\\(Get-Content .cursorrules -Raw\\).Length; Get-Content .cursorrules\")",
-      "Bash(powershell -Command \"Get-ChildItem -File | ForEach-Object { $_Name }\")",
-      "Bash(dir \"C:\\\\Users\\\\Craig\\\\FBAI_VibeGIS_Development\\\\vibegis.website\")",
       "Bash(tree:*)",
-      "Bash(ls:*)",
-      "Bash(npm run build:*)",
+      "Skill(prime)",
+      "Skill(git-validate)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
       "Skill(session-end)",
-      "Bash(git add:*)"
-    ]
+      "Bash(git push:*)",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__query-docs",
+      "Skill(eod)",
+      "Bash(git --version:*)",
+      "Bash(git config:*)",
+      "Bash(git rev-parse:*)",
+      "Bash(gh --version:*)",
+      "Bash(gh auth status:*)",
+      "Bash(gh repo view:*)",
+      "Bash(gh issue list:*)",
+      "Bash(gh pr list:*)",
+      "Bash(dir:*)",
+      "Bash(findstr:*)",
+      "Bash(test:*)",
+      "Bash(node --version)",
+      "Bash(npm --version)",
+      "Bash(npm run build:*)",
+      "Bash(npx tsc:*)",
+      "mcp__playwright__playwright_navigate"
+    ],
+    "deny": [],
+    "ask": []
   }
 }

@@ -1,0 +1,21 @@
+﻿{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python .claude/hooks/user_prompt_submit.py"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [],
+    "PostToolUse": [],
+    "Notification": [],
+    "Stop": [],
+    "SubagentStop": [],
+    "PreCompact": [],
+    "SessionStart": []
+  }
+}

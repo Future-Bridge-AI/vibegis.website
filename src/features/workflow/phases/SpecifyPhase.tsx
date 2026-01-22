@@ -1,11 +1,14 @@
 import { useEffect, useMemo } from "react";
 
+import { generateStructuredPRD } from "@/lib/anthropic";
+
 import { useWorkflowStore } from "../store";
 import type {
   CalciteComponentType,
   FunctionalRequirement,
   RequirementPriority,
   SettingType,
+  WidgetPRD,
   WidgetSetting,
 } from "../types";
 
@@ -42,6 +45,13 @@ const SpecifyPhase = () => {
   const widgetBrief = useWorkflowStore((state) => state.widgetBrief);
   const widgetPRD = useWorkflowStore((state) => state.widgetPRD);
   const updatePRD = useWorkflowStore((state) => state.updatePRD);
+  const aiAnalysis = useWorkflowStore((state) => state.aiAnalysis);
+  const isSpecifying = useWorkflowStore((state) => state.isSpecifying);
+  const setSpecifying = useWorkflowStore((state) => state.setSpecifying);
+  const aiPRD = useWorkflowStore((state) => state.aiPRD);
+  const setAIPRD = useWorkflowStore((state) => state.setAIPRD);
+  const error = useWorkflowStore((state) => state.error);
+  const setError = useWorkflowStore((state) => state.setError);
 
   const suggestedRequirements = useMemo<FunctionalRequirement[]>(() => {
     switch (widgetBrief.mapInteraction) {
@@ -89,11 +99,13 @@ const SpecifyPhase = () => {
       case "View only (no interaction)":
         return [
           {
-            description: "Present map layers and widget content in a read-only view.",
+            description:
+              "Present map layers and widget content in a read-only view.",
             priority: "High",
           },
           {
-            description: "Explain data sources and context without interactions.",
+            description:
+              "Explain data sources and context without interactions.",
             priority: "Low",
           },
         ];
@@ -115,11 +127,15 @@ const SpecifyPhase = () => {
     if (widgetPRD.functionalRequirements.length === 0) {
       updatePRD({ functionalRequirements: suggestedRequirements });
     }
-  }, [suggestedRequirements, updatePRD, widgetPRD.functionalRequirements.length]);
+  }, [
+    suggestedRequirements,
+    updatePRD,
+    widgetPRD.functionalRequirements.length,
+  ]);
 
   const updateRequirement = (index: number, updates: FunctionalRequirement) => {
     const nextRequirements = widgetPRD.functionalRequirements.map((item, idx) =>
-      idx === index ? updates : item,
+      idx === index ? updates : item
     );
     updatePRD({ functionalRequirements: nextRequirements });
   };
@@ -136,7 +152,7 @@ const SpecifyPhase = () => {
   const removeRequirement = (index: number) => {
     updatePRD({
       functionalRequirements: widgetPRD.functionalRequirements.filter(
-        (_, idx) => idx !== index,
+        (_, idx) => idx !== index
       ),
     });
   };
@@ -153,7 +169,7 @@ const SpecifyPhase = () => {
 
   const updateSetting = (index: number, updates: WidgetSetting) => {
     const nextSettings = widgetPRD.settingsConfig.settings.map((item, idx) =>
-      idx === index ? updates : item,
+      idx === index ? updates : item
     );
     updatePRD({
       settingsConfig: {
@@ -177,7 +193,7 @@ const SpecifyPhase = () => {
       settingsConfig: {
         ...widgetPRD.settingsConfig,
         settings: widgetPRD.settingsConfig.settings.filter(
-          (_, idx) => idx !== index,
+          (_, idx) => idx !== index
         ),
       },
     });
@@ -185,10 +201,10 @@ const SpecifyPhase = () => {
 
   const toggleComponent = (component: CalciteComponentType) => {
     const nextComponents = widgetPRD.uiRequirements.preferredComponents.includes(
-      component,
+      component
     )
       ? widgetPRD.uiRequirements.preferredComponents.filter(
-          (item) => item !== component,
+          (item) => item !== component
         )
       : [...widgetPRD.uiRequirements.preferredComponents, component];
 
@@ -203,34 +219,111 @@ const SpecifyPhase = () => {
   const hasDataSource =
     widgetBrief.dataSource !== "" && widgetBrief.dataSource !== "No data source";
 
+  const handleGeneratePRD = async () => {
+    setSpecifying(true);
+    setError(null);
+
+    try {
+      const response = await generateStructuredPRD(widgetBrief, aiAnalysis);
+      setAIPRD(response.content);
+
+      // Parse and apply the structured PRD
+      try {
+        const parsed = JSON.parse(response.content) as Partial<WidgetPRD>;
+
+        // Apply the parsed PRD to the form
+        if (parsed.functionalRequirements) {
+          updatePRD({
+            functionalRequirements: parsed.functionalRequirements,
+          });
+        }
+        if (parsed.settingsConfig) {
+          updatePRD({
+            settingsConfig: parsed.settingsConfig,
+          });
+        }
+        if (parsed.dataBindings) {
+          updatePRD({
+            dataBindings: parsed.dataBindings,
+          });
+        }
+        if (parsed.uiRequirements) {
+          updatePRD({
+            uiRequirements: parsed.uiRequirements,
+          });
+        }
+      } catch {
+        // If parsing fails, just store the raw response
+        console.warn("Could not parse AI PRD response as JSON");
+      }
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to generate PRD";
+      setError(errorMessage);
+    } finally {
+      setSpecifying(false);
+    }
+  };
+
+  const canGeneratePRD =
+    widgetBrief.name.trim() !== "" || widgetBrief.displayLabel.trim() !== "";
+
   return (
     <div className="space-y-8">
       <div className="space-y-2">
-        <p className="wizard-section-title">
-          Specify Phase
-        </p>
-        <h2 className="font-sans text-2xl font-bold text-gray-100">Widget PRD</h2>
+        <p className="wizard-section-title">Specify Phase</p>
+        <h2 className="font-sans text-2xl font-bold text-gray-100">
+          Widget PRD
+        </h2>
         <p className="font-mono text-sm text-gray-400">
-          Translate the widget brief into detailed requirements, settings, and UI
-          expectations.
+          Translate the widget brief into detailed requirements, settings, and
+          UI expectations.
         </p>
       </div>
 
       <div className="wizard-card">
-        <p className="font-mono text-xs font-semibold uppercase tracking-[0.25em] text-gray-500">
-          Brief Summary
-        </p>
-        <div className="mt-3 space-y-2">
-          <h3 className="font-sans text-lg font-bold text-gray-100">
-            {widgetBrief.displayLabel || "Untitled Widget"}
-          </h3>
-          <p className="font-mono text-sm text-gray-400">
-            {widgetBrief.description ||
-              "Add a description in the Analyze phase to summarize the widget."}
-          </p>
-          <p className="font-mono text-xs text-gray-600">Folder name: {widgetBrief.name || "-"}</p>
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <p className="font-mono text-xs font-semibold uppercase tracking-[0.25em] text-gray-500">
+              Brief Summary
+            </p>
+            <div className="mt-3 space-y-2">
+              <h3 className="font-sans text-lg font-bold text-gray-100">
+                {widgetBrief.displayLabel || "Untitled Widget"}
+              </h3>
+              <p className="font-mono text-sm text-gray-400">
+                {widgetBrief.description ||
+                  "Add a description in the Analyze phase to summarize the widget."}
+              </p>
+              <p className="font-mono text-xs text-gray-600">
+                Folder name: {widgetBrief.name || "-"}
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={handleGeneratePRD}
+            disabled={!canGeneratePRD || isSpecifying}
+            className="rounded-full bg-fiesta-turquoise px-6 py-3 font-mono text-sm font-bold text-geodark shadow-lg shadow-fiesta-turquoise/30 transition hover:bg-fiesta-turquoise/90 hover:shadow-wizard-glow disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
+          >
+            {isSpecifying ? "Generating..." : "Generate PRD with AI"}
+          </button>
         </div>
       </div>
+
+      {error && (
+        <div className="rounded-xl border border-fiesta-pink/40 bg-fiesta-pink/10 px-4 py-3">
+          <p className="font-mono text-sm text-fiesta-pink">{error}</p>
+        </div>
+      )}
+
+      {aiPRD && (
+        <div className="rounded-2xl border border-fiesta-turquoise/30 bg-fiesta-turquoise/5 p-4">
+          <p className="font-mono text-xs text-fiesta-turquoise">
+            AI-generated PRD applied to form fields below
+          </p>
+        </div>
+      )}
 
       <form className="space-y-8">
         <div className="border-t border-wizard-border/80 pt-6">
@@ -522,7 +615,7 @@ const SpecifyPhase = () => {
                   <input
                     type="checkbox"
                     checked={widgetPRD.uiRequirements.preferredComponents.includes(
-                      component,
+                      component
                     )}
                     onChange={() => toggleComponent(component)}
                     className="h-4 w-4 rounded border-wizard-border bg-geodark text-fiesta-turquoise focus:ring-fiesta-turquoise/60"

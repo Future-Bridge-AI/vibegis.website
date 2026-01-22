@@ -1,10 +1,13 @@
 import { useEffect, useMemo, useRef } from "react";
 
+import { generateStructuredArchitecture } from "@/lib/anthropic";
+
 import { useWorkflowStore } from "../store";
 import type {
   ArcgisModuleType,
   MessageType,
   StateManagementApproach,
+  WidgetArchitecture,
   WidgetSubComponent,
 } from "../types";
 
@@ -47,8 +50,18 @@ const toPascalCase = (value: string) =>
 const ArchitectPhase = () => {
   const widgetBrief = useWorkflowStore((state) => state.widgetBrief);
   const widgetPRD = useWorkflowStore((state) => state.widgetPRD);
-  const widgetArchitecture = useWorkflowStore((state) => state.widgetArchitecture);
-  const updateArchitecture = useWorkflowStore((state) => state.updateArchitecture);
+  const widgetArchitecture = useWorkflowStore(
+    (state) => state.widgetArchitecture
+  );
+  const updateArchitecture = useWorkflowStore(
+    (state) => state.updateArchitecture
+  );
+  const isArchitecting = useWorkflowStore((state) => state.isArchitecting);
+  const setArchitecting = useWorkflowStore((state) => state.setArchitecting);
+  const aiArchitecture = useWorkflowStore((state) => state.aiArchitecture);
+  const setAIArchitecture = useWorkflowStore((state) => state.setAIArchitecture);
+  const error = useWorkflowStore((state) => state.error);
+  const setError = useWorkflowStore((state) => state.setError);
 
   const requirementCount = widgetPRD.functionalRequirements.length;
   const hasSettings = widgetPRD.settingsConfig.hasSettings;
@@ -71,7 +84,8 @@ const ArchitectPhase = () => {
         jimuIntegration: {
           ...widgetArchitecture.jimuIntegration,
           usesJimuMapView:
-            hasMapInteraction || widgetArchitecture.jimuIntegration.usesJimuMapView,
+            hasMapInteraction ||
+            widgetArchitecture.jimuIntegration.usesJimuMapView,
           usesDataSourceComponent:
             hasDataSource ||
             widgetArchitecture.jimuIntegration.usesDataSourceComponent,
@@ -117,7 +131,7 @@ const ArchitectPhase = () => {
   const updateSubComponent = (index: number, updates: WidgetSubComponent) => {
     updateArchitecture({
       subComponents: widgetArchitecture.subComponents.map((item, idx) =>
-        idx === index ? updates : item,
+        idx === index ? updates : item
       ),
     });
   };
@@ -131,17 +145,17 @@ const ArchitectPhase = () => {
   const removeSubComponent = (index: number) => {
     updateArchitecture({
       subComponents: widgetArchitecture.subComponents.filter(
-        (_, idx) => idx !== index,
+        (_, idx) => idx !== index
       ),
     });
   };
 
   const toggleMessageType = (message: MessageType) => {
     const nextTypes = widgetArchitecture.jimuIntegration.messageTypes.includes(
-      message,
+      message
     )
       ? widgetArchitecture.jimuIntegration.messageTypes.filter(
-          (item) => item !== message,
+          (item) => item !== message
         )
       : [...widgetArchitecture.jimuIntegration.messageTypes, message];
 
@@ -157,7 +171,7 @@ const ArchitectPhase = () => {
     const nextModules =
       widgetArchitecture.dependencies.additionalArcgisModules.includes(moduleName)
         ? widgetArchitecture.dependencies.additionalArcgisModules.filter(
-            (item) => item !== moduleName,
+            (item) => item !== moduleName
           )
         : [
             ...widgetArchitecture.dependencies.additionalArcgisModules,
@@ -172,6 +186,82 @@ const ArchitectPhase = () => {
     });
   };
 
+  const handleGenerateArchitecture = async () => {
+    setArchitecting(true);
+    setError(null);
+
+    try {
+      const response = await generateStructuredArchitecture(
+        {
+          name: widgetBrief.name,
+          displayLabel: widgetBrief.displayLabel,
+          description: widgetBrief.description,
+          mapInteraction: widgetBrief.mapInteraction,
+          dataSource: widgetBrief.dataSource,
+        },
+        {
+          functionalRequirements: widgetPRD.functionalRequirements,
+          settingsConfig: { hasSettings: widgetPRD.settingsConfig.hasSettings },
+          dataBindings: {
+            requiresLayerSelection:
+              widgetPRD.dataBindings.requiresLayerSelection,
+            requiresFieldSelection:
+              widgetPRD.dataBindings.requiresFieldSelection,
+          },
+          uiRequirements: {
+            preferredComponents: widgetPRD.uiRequirements.preferredComponents,
+          },
+        }
+      );
+      setAIArchitecture(response.content);
+
+      // Parse and apply the structured architecture
+      try {
+        const parsed = JSON.parse(
+          response.content
+        ) as Partial<WidgetArchitecture>;
+
+        // Apply the parsed architecture to the form
+        if (parsed.mainComponentName) {
+          updateArchitecture({ mainComponentName: parsed.mainComponentName });
+        }
+        if (parsed.stateManagement) {
+          updateArchitecture({ stateManagement: parsed.stateManagement });
+        }
+        if (parsed.subComponents) {
+          updateArchitecture({ subComponents: parsed.subComponents });
+        }
+        if (parsed.jimuIntegration) {
+          updateArchitecture({
+            jimuIntegration: {
+              ...widgetArchitecture.jimuIntegration,
+              ...parsed.jimuIntegration,
+            },
+          });
+        }
+        if (parsed.dependencies) {
+          updateArchitecture({
+            dependencies: {
+              ...widgetArchitecture.dependencies,
+              ...parsed.dependencies,
+            },
+          });
+        }
+      } catch {
+        console.warn("Could not parse AI architecture response as JSON");
+      }
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to generate architecture";
+      setError(errorMessage);
+    } finally {
+      setArchitecting(false);
+    }
+  };
+
+  const canGenerateArchitecture =
+    widgetBrief.name.trim() !== "" || widgetBrief.displayLabel.trim() !== "";
+
   const fileList = [
     { name: "manifest.json", selected: true },
     { name: "config.ts", selected: true },
@@ -184,9 +274,7 @@ const ArchitectPhase = () => {
   return (
     <div className="space-y-8">
       <div className="space-y-2">
-        <p className="wizard-section-title">
-          Architect Phase
-        </p>
+        <p className="wizard-section-title">Architect Phase</p>
         <h2 className="font-sans text-2xl font-bold text-gray-100">
           Widget Architecture
         </h2>
@@ -196,21 +284,49 @@ const ArchitectPhase = () => {
       </div>
 
       <div className="wizard-card">
-        <p className="font-mono text-xs font-semibold uppercase tracking-[0.25em] text-gray-500">
-          Brief Summary
-        </p>
-        <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h3 className="font-sans text-lg font-bold text-gray-100">
-              {widgetBrief.displayLabel || "Untitled Widget"}
-            </h3>
-            <p className="font-mono text-xs text-gray-500">Folder: {widgetBrief.name || "-"}</p>
+            <p className="font-mono text-xs font-semibold uppercase tracking-[0.25em] text-gray-500">
+              Brief Summary
+            </p>
+            <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h3 className="font-sans text-lg font-bold text-gray-100">
+                  {widgetBrief.displayLabel || "Untitled Widget"}
+                </h3>
+                <p className="font-mono text-xs text-gray-500">
+                  Folder: {widgetBrief.name || "-"}
+                </p>
+              </div>
+              <span className="rounded-full border border-wizard-border px-3 py-1 font-mono text-xs text-gray-400">
+                {requirementCount} requirements captured
+              </span>
+            </div>
           </div>
-          <span className="rounded-full border border-wizard-border px-3 py-1 font-mono text-xs text-gray-400">
-            {requirementCount} requirements captured
-          </span>
+          <button
+            type="button"
+            onClick={handleGenerateArchitecture}
+            disabled={!canGenerateArchitecture || isArchitecting}
+            className="rounded-full bg-fiesta-turquoise px-6 py-3 font-mono text-sm font-bold text-geodark shadow-lg shadow-fiesta-turquoise/30 transition hover:bg-fiesta-turquoise/90 hover:shadow-wizard-glow disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
+          >
+            {isArchitecting ? "Generating..." : "Generate Architecture with AI"}
+          </button>
         </div>
       </div>
+
+      {error && (
+        <div className="rounded-xl border border-fiesta-pink/40 bg-fiesta-pink/10 px-4 py-3">
+          <p className="font-mono text-sm text-fiesta-pink">{error}</p>
+        </div>
+      )}
+
+      {aiArchitecture && (
+        <div className="rounded-2xl border border-fiesta-turquoise/30 bg-fiesta-turquoise/5 p-4">
+          <p className="font-mono text-xs text-fiesta-turquoise">
+            AI-generated architecture applied to form fields below
+          </p>
+        </div>
+      )}
 
       <form className="space-y-8">
         <div className="border-t border-wizard-border/80 pt-6">
@@ -220,7 +336,8 @@ const ArchitectPhase = () => {
                 File Structure Preview
               </h3>
               <p className="font-mono text-xs text-gray-500">
-                Preview the Experience Builder widget files that will be generated.
+                Preview the Experience Builder widget files that will be
+                generated.
               </p>
             </div>
             <div className="rounded-2xl border border-wizard-border bg-geodark-secondary/60 p-4 text-sm">
@@ -405,7 +522,9 @@ const ArchitectPhase = () => {
               <label className="flex items-center gap-3 rounded-xl border border-wizard-border bg-geodark-secondary/60 px-4 py-3 font-mono text-sm text-gray-300">
                 <input
                   type="checkbox"
-                  checked={widgetArchitecture.jimuIntegration.usesDataSourceComponent}
+                  checked={
+                    widgetArchitecture.jimuIntegration.usesDataSourceComponent
+                  }
                   onChange={(event) =>
                     updateArchitecture({
                       jimuIntegration: {
@@ -467,7 +586,7 @@ const ArchitectPhase = () => {
                       <input
                         type="checkbox"
                         checked={widgetArchitecture.jimuIntegration.messageTypes.includes(
-                          message,
+                          message
                         )}
                         onChange={() => toggleMessageType(message)}
                         className="h-4 w-4 rounded border-wizard-border bg-geodark text-fiesta-turquoise focus:ring-fiesta-turquoise/60"
@@ -484,7 +603,9 @@ const ArchitectPhase = () => {
         <div className="border-t border-wizard-border/80 pt-6">
           <div className="space-y-4">
             <div>
-              <h3 className="font-mono text-sm font-semibold text-gray-300">Dependencies</h3>
+              <h3 className="font-mono text-sm font-semibold text-gray-300">
+                Dependencies
+              </h3>
               <p className="font-mono text-xs text-gray-500">
                 Confirm required modules and any additional ArcGIS dependencies.
               </p>
@@ -517,7 +638,7 @@ const ArchitectPhase = () => {
                     <input
                       type="checkbox"
                       checked={widgetArchitecture.dependencies.additionalArcgisModules.includes(
-                        moduleName,
+                        moduleName
                       )}
                       onChange={() => toggleArcgisModule(moduleName)}
                       className="h-4 w-4 rounded border-wizard-border bg-geodark text-fiesta-turquoise focus:ring-fiesta-turquoise/60"
