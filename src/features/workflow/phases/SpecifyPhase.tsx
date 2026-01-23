@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from "react";
 
-import { generateStructuredPRD } from "@/lib/anthropic";
+import { generateStructuredPRD } from "@/lib/ai";
 
 import { useWorkflowStore } from "../store";
 import type {
@@ -52,6 +52,7 @@ const SpecifyPhase = () => {
   const setAIPRD = useWorkflowStore((state) => state.setAIPRD);
   const error = useWorkflowStore((state) => state.error);
   const setError = useWorkflowStore((state) => state.setError);
+  const aiConfigured = useWorkflowStore((state) => state.aiConfigured);
 
   const suggestedRequirements = useMemo<FunctionalRequirement[]>(() => {
     switch (widgetBrief.mapInteraction) {
@@ -266,7 +267,8 @@ const SpecifyPhase = () => {
   };
 
   const canGeneratePRD =
-    widgetBrief.name.trim() !== "" || widgetBrief.displayLabel.trim() !== "";
+    aiConfigured &&
+    (widgetBrief.name.trim() !== "" || widgetBrief.displayLabel.trim() !== "");
 
   return (
     <div className="space-y-8">

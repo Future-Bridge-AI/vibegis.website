@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 
 import Editor from "@monaco-editor/react";
 
-import { generateWidgetCode } from "@/lib/anthropic";
+import { generateWidgetCode } from "@/lib/ai";
 import { generateWidget, packageWidget } from "@/lib/generator";
 
 import { useWorkflowStore } from "../store";
@@ -21,6 +21,7 @@ const GeneratePhase = () => {
   const aiPRD = useWorkflowStore((state) => state.aiPRD);
   const error = useWorkflowStore((state) => state.error);
   const setError = useWorkflowStore((state) => state.setError);
+  const aiConfigured = useWorkflowStore((state) => state.aiConfigured);
 
   const [generatedFiles, setGeneratedFiles] = useState<Record<string, string>>(
     {}
@@ -79,6 +80,11 @@ const GeneratePhase = () => {
   };
 
   const handleGenerateAI = async () => {
+    if (!aiConfigured) {
+      setError("Please configure your AI settings first (OpenRouter API key)");
+      return;
+    }
+
     setGenerating(true);
     setError(null);
 
@@ -223,13 +229,17 @@ Required Modules: ${workflowState.widgetArchitecture.dependencies.requiredJimuMo
               <button
                 type="button"
                 onClick={() => setGenerationMode("ai")}
+                disabled={!aiConfigured}
                 className={`rounded-full px-4 py-2 font-mono text-xs font-semibold transition ${
                   generationMode === "ai"
                     ? "bg-fiesta-turquoise text-geodark"
-                    : "text-gray-400 hover:text-white"
+                    : !aiConfigured
+                      ? "text-gray-600 cursor-not-allowed"
+                      : "text-gray-400 hover:text-white"
                 }`}
+                title={!aiConfigured ? "Configure AI settings first" : undefined}
               >
-                AI Code
+                AI Code {!aiConfigured && "(Setup Required)"}
               </button>
             </div>
             <button

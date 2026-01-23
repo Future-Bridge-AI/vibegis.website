@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from "react";
 
-import { generateStructuredArchitecture } from "@/lib/anthropic";
+import { generateStructuredArchitecture } from "@/lib/ai";
 
 import { useWorkflowStore } from "../store";
 import type {
@@ -62,6 +62,7 @@ const ArchitectPhase = () => {
   const setAIArchitecture = useWorkflowStore((state) => state.setAIArchitecture);
   const error = useWorkflowStore((state) => state.error);
   const setError = useWorkflowStore((state) => state.setError);
+  const aiConfigured = useWorkflowStore((state) => state.aiConfigured);
 
   const requirementCount = widgetPRD.functionalRequirements.length;
   const hasSettings = widgetPRD.settingsConfig.hasSettings;
@@ -260,7 +261,8 @@ const ArchitectPhase = () => {
   };
 
   const canGenerateArchitecture =
-    widgetBrief.name.trim() !== "" || widgetBrief.displayLabel.trim() !== "";
+    aiConfigured &&
+    (widgetBrief.name.trim() !== "" || widgetBrief.displayLabel.trim() !== "");
 
   const fileList = [
     { name: "manifest.json", selected: true },

@@ -8,6 +8,13 @@ import {
   type WorkflowState,
   createInitialWorkflowState,
 } from "@/core/types";
+import type { AIConfig, AIProvider } from "@/lib/ai/types";
+import {
+  initializeProvider,
+  loadAISettings,
+  clearAISettings,
+  isProviderReady,
+} from "@/lib/ai";
 
 /**
  * AI Loading States
@@ -34,6 +41,16 @@ type AIResponses = {
  */
 type ErrorState = {
   error: string | null;
+};
+
+/**
+ * AI Settings State
+ */
+type AISettingsState = {
+  aiProvider: AIProvider;
+  aiModel: string;
+  aiApiKey: string;
+  aiConfigured: boolean;
 };
 
 /**
@@ -65,13 +82,20 @@ type WorkflowActions = {
   setError: (error: string | null) => void;
   clearError: () => void;
 
+  // AI Settings
+  configureAI: (provider: AIProvider, apiKey: string, model: string) => void;
+  clearAIConfig: () => void;
+
   // Reset
   reset: () => void;
 };
 
 const initialWorkflowState = createInitialWorkflowState();
 
-const initialAIState: AILoadingState & AIResponses & ErrorState = {
+// Load saved AI settings
+const savedAISettings = loadAISettings();
+
+const initialAIState: AILoadingState & AIResponses & ErrorState & AISettingsState = {
   isAnalyzing: false,
   isSpecifying: false,
   isArchitecting: false,
@@ -81,12 +105,18 @@ const initialAIState: AILoadingState & AIResponses & ErrorState = {
   aiArchitecture: "",
   aiCode: "",
   error: null,
+  // AI Settings
+  aiProvider: savedAISettings?.provider ?? "openrouter",
+  aiModel: savedAISettings?.model ?? "anthropic/claude-sonnet-4",
+  aiApiKey: savedAISettings?.apiKey ?? "",
+  aiConfigured: isProviderReady(),
 };
 
 type WorkflowStore = WorkflowState &
   AILoadingState &
   AIResponses &
   ErrorState &
+  AISettingsState &
   WorkflowActions;
 
 export const useWorkflowStore = create<WorkflowStore>((set) => ({
@@ -141,6 +171,29 @@ export const useWorkflowStore = create<WorkflowStore>((set) => ({
   // Error handling
   setError: (error) => set({ error }),
   clearError: () => set({ error: null }),
+
+  // AI Settings
+  configureAI: (provider, apiKey, model) => {
+    const config: AIConfig = { provider, apiKey, model };
+    initializeProvider(config);
+    set({
+      aiProvider: provider,
+      aiApiKey: apiKey,
+      aiModel: model,
+      aiConfigured: true,
+      error: null,
+    });
+  },
+
+  clearAIConfig: () => {
+    clearAISettings();
+    set({
+      aiProvider: "openrouter",
+      aiApiKey: "",
+      aiModel: "anthropic/claude-sonnet-4",
+      aiConfigured: false,
+    });
+  },
 
   // Reset to initial state
   reset: () =>

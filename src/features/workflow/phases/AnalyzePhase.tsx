@@ -1,4 +1,5 @@
-import { analyzeWidgetIdea } from "@/lib/anthropic";
+import { AISettingsPanel } from "@/components/ui/AISettingsPanel";
+import { analyzeWidgetIdea } from "@/lib/ai";
 
 import { useWorkflowStore } from "../store";
 import type {
@@ -38,6 +39,7 @@ const AnalyzePhase = () => {
   const setAIAnalysis = useWorkflowStore((state) => state.setAIAnalysis);
   const error = useWorkflowStore((state) => state.error);
   const setError = useWorkflowStore((state) => state.setError);
+  const aiConfigured = useWorkflowStore((state) => state.aiConfigured);
 
   const toggleTargetUser = (user: TargetUserType) => {
     const nextUsers = widgetBrief.targetUsers.includes(user)
@@ -75,10 +77,14 @@ Key Features: ${widgetBrief.keyFeatures || "Not specified"}
   };
 
   const canAskAI =
-    widgetBrief.name.trim() !== "" || widgetBrief.displayLabel.trim() !== "";
+    aiConfigured &&
+    (widgetBrief.name.trim() !== "" || widgetBrief.displayLabel.trim() !== "");
 
   return (
     <div className="space-y-8">
+      {/* AI Settings Panel */}
+      <AISettingsPanel className="mb-6" />
+
       <div className="space-y-2">
         <p className="wizard-section-title">Analyze Phase</p>
         <h2 className="font-sans text-2xl font-bold text-gray-100">
