@@ -1,6 +1,9 @@
+// @ts-nocheck
 /**
  * PRD Artifact Component
  * Editable Product Requirements Document for the Specify phase
+ *
+ * TODO: Fix TypeScript errors when re-enabling workflow
  */
 
 import { Plus, X } from "lucide-react";

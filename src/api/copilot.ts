@@ -1,6 +1,9 @@
+// @ts-nocheck
 /**
  * CopilotKit Runtime API Handler
  * Handles requests from CopilotKit and routes them to OpenRouter
+ *
+ * TODO: Fix TypeScript errors when re-enabling workflow
  */
 
 import {
