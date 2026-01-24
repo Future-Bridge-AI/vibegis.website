@@ -10,7 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.30.0",
+    "@anthropic-ai/sdk": "^0.57.0",
+    "@copilotkit/react-core": "^1.51.2",
+    "@copilotkit/react-ui": "^1.51.2",
+    "@copilotkit/runtime": "^1.51.2",
     "@monaco-editor/react": "^4.6.0",
     "@stripe/stripe-js": "^4.8.0",
     "@supabase/supabase-js": "^2.45.0",
@@ -18,6 +21,7 @@
     "clsx": "^2.1.1",
     "jszip": "^3.10.1",
     "lucide-react": "^0.451.0",
+    "openai": "^5.9.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.1.1",

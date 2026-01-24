@@ -164,6 +164,60 @@ export interface AgentResponse {
 }
 
 /**
+ * Chat message for conversational workflow
+ */
+export interface ChatMessage {
+  id: string;
+  role: "user" | "assistant" | "system";
+  content: string;
+  timestamp: number;
+  generativeUI?: boolean;
+}
+
+/**
+ * Artifact status during chat-driven workflow
+ */
+export type ArtifactStatus = "empty" | "building" | "complete" | "editing";
+
+/**
+ * Per-phase chat state
+ */
+export interface PhaseChat {
+  messages: ChatMessage[];
+  isStreaming: boolean;
+  artifactStatus: ArtifactStatus;
+}
+
+/**
+ * Complete chat state across all phases
+ */
+export interface ChatState {
+  analyze: PhaseChat;
+  specify: PhaseChat;
+  architect: PhaseChat;
+  generate: PhaseChat;
+}
+
+/**
+ * Create initial phase chat state
+ */
+export const createInitialPhaseChat = (): PhaseChat => ({
+  messages: [],
+  isStreaming: false,
+  artifactStatus: "empty",
+});
+
+/**
+ * Create initial chat state
+ */
+export const createInitialChatState = (): ChatState => ({
+  analyze: createInitialPhaseChat(),
+  specify: createInitialPhaseChat(),
+  architect: createInitialPhaseChat(),
+  generate: createInitialPhaseChat(),
+});
+
+/**
  * Initial state factory for workflow
  */
 export const createInitialWorkflowState = (): WorkflowState => ({

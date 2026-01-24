@@ -1,0 +1,15 @@
+{
+  "phase": "analyze",
+  "widgetBrief": {
+    "name": "weather-app",
+    "label": "Weather App",
+    "description": "Displays weather",
+    "targetUsers": ["Public/Citizens"],
+    "mapInteractionType": "Click to select",
+    "dataSourceType": "Web Map",
+    "keyFeatures": []
+  },
+  "prd": null,
+  "architecture": null,
+  "aiAnalysis": null
+}

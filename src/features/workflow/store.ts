@@ -6,7 +6,11 @@ import {
   type WidgetPRD,
   WorkflowPhase,
   type WorkflowState,
+  type ChatState,
+  type ArtifactStatus,
+  type ChatMessage,
   createInitialWorkflowState,
+  createInitialChatState,
 } from "@/core/types";
 import type { AIConfig, AIProvider } from "@/lib/ai/types";
 import {
@@ -54,6 +58,13 @@ type AISettingsState = {
 };
 
 /**
+ * Chat State Wrapper
+ */
+type ChatStateWrapper = {
+  chatState: ChatState;
+};
+
+/**
  * Workflow Actions
  */
 type WorkflowActions = {
@@ -86,6 +97,21 @@ type WorkflowActions = {
   configureAI: (provider: AIProvider, apiKey: string, model: string) => void;
   clearAIConfig: () => void;
 
+  // Chat Actions
+  addChatMessage: (
+    phase: "analyze" | "specify" | "architect" | "generate",
+    message: Omit<ChatMessage, "id" | "timestamp">
+  ) => void;
+  setChatStreaming: (
+    phase: "analyze" | "specify" | "architect" | "generate",
+    isStreaming: boolean
+  ) => void;
+  setArtifactStatus: (
+    phase: "analyze" | "specify" | "architect" | "generate",
+    status: ArtifactStatus
+  ) => void;
+  clearChatPhase: (phase: "analyze" | "specify" | "architect" | "generate") => void;
+
   // Reset
   reset: () => void;
 };
@@ -117,7 +143,10 @@ type WorkflowStore = WorkflowState &
   AIResponses &
   ErrorState &
   AISettingsState &
+  ChatStateWrapper &
   WorkflowActions;
+
+const initialChatState = createInitialChatState();
 
 export const useWorkflowStore = create<WorkflowStore>((set) => ({
   // Initial workflow state
@@ -125,6 +154,9 @@ export const useWorkflowStore = create<WorkflowStore>((set) => ({
 
   // Initial AI state
   ...initialAIState,
+
+  // Initial chat state
+  chatState: initialChatState,
 
   // Phase navigation
   setPhase: (phase) => set({ currentPhase: phase }),
@@ -195,10 +227,64 @@ export const useWorkflowStore = create<WorkflowStore>((set) => ({
     });
   },
 
+  // Chat Actions
+  addChatMessage: (phase, message) =>
+    set((state) => ({
+      chatState: {
+        ...state.chatState,
+        [phase]: {
+          ...state.chatState[phase],
+          messages: [
+            ...state.chatState[phase].messages,
+            {
+              ...message,
+              id: crypto.randomUUID(),
+              timestamp: Date.now(),
+            },
+          ],
+        },
+      },
+    })),
+
+  setChatStreaming: (phase, isStreaming) =>
+    set((state) => ({
+      chatState: {
+        ...state.chatState,
+        [phase]: {
+          ...state.chatState[phase],
+          isStreaming,
+        },
+      },
+    })),
+
+  setArtifactStatus: (phase, artifactStatus) =>
+    set((state) => ({
+      chatState: {
+        ...state.chatState,
+        [phase]: {
+          ...state.chatState[phase],
+          artifactStatus,
+        },
+      },
+    })),
+
+  clearChatPhase: (phase) =>
+    set((state) => ({
+      chatState: {
+        ...state.chatState,
+        [phase]: {
+          messages: [],
+          isStreaming: false,
+          artifactStatus: "empty",
+        },
+      },
+    })),
+
   // Reset to initial state
   reset: () =>
     set({
       ...initialWorkflowState,
       ...initialAIState,
+      chatState: initialChatState,
     }),
 }));

@@ -26,7 +26,8 @@
       "Bash(npm --version)",
       "Bash(npm run build:*)",
       "Bash(npx tsc:*)",
-      "mcp__playwright__playwright_navigate"
+      "mcp__playwright__playwright_navigate",
+      "WebSearch"
     ],
     "deny": [],
     "ask": []

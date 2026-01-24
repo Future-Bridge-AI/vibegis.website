@@ -25,4 +25,9 @@ export {
   type WidgetDependencies,
   type WidgetArchitecture,
   type WorkflowState,
+  // Chat types
+  type ChatMessage,
+  type ArtifactStatus,
+  type PhaseChat,
+  type ChatState,
 } from "@/core/types";
