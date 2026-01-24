@@ -125,7 +125,7 @@ export class OpenRouterProvider implements IAIProvider {
     }
 
     const choice = data.choices[0];
-    if (!choice.message?.content) {
+    if (!choice || !choice.message?.content) {
       throw new Error("Empty response from OpenRouter API");
     }
 

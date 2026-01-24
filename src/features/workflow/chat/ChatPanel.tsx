@@ -4,17 +4,23 @@
  */
 
 import { useRef, useEffect, type ReactNode } from "react";
-import { useCopilotChat, type Message } from "@copilotkit/react-core";
-import { cn } from "@/lib/utils";
+import { useCopilotChat } from "@copilotkit/react-core";
 import { useWorkflowStore } from "../store";
 import { WorkflowPhase } from "../types";
 import { ChatMessage } from "./ChatMessage";
 import { ChatInput } from "./ChatInput";
 
+// Define our own message type to avoid CopilotKit version issues
+interface ChatMessageType {
+  id: string;
+  role: string;
+  content: string;
+}
+
 interface ChatPanelProps {
-  systemPrompt: string;
+  systemPrompt?: string;
   suggestions?: string[];
-  renderGenerativeUI?: (message: Message) => ReactNode;
+  renderGenerativeUI?: (message: ChatMessageType) => ReactNode;
 }
 
 /**
@@ -34,7 +40,6 @@ function getPhaseKey(phase: WorkflowPhase): "analyze" | "specify" | "architect" 
 }
 
 export function ChatPanel({
-  systemPrompt,
   suggestions = [],
   renderGenerativeUI,
 }: ChatPanelProps) {
@@ -60,11 +65,12 @@ export function ChatPanel({
       id: crypto.randomUUID(),
       role: "user",
       content,
-    });
+    } as Parameters<typeof appendMessage>[0]);
   };
 
   // Filter messages to show only user and assistant messages
-  const displayMessages = visibleMessages.filter(
+  // Cast to our internal type to avoid CopilotKit version issues
+  const displayMessages = (visibleMessages as unknown as ChatMessageType[]).filter(
     (msg) => msg.role === "user" || msg.role === "assistant"
   );
 

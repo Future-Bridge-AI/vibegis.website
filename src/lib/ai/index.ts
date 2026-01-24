@@ -12,7 +12,6 @@ import {
   DEVELOPER_SYSTEM_PROMPT,
   PM_STRUCTURED_SYSTEM_PROMPT,
   buildAnalystUserPrompt,
-  buildDeveloperUserPrompt,
   buildStructuredArchitectUserPrompt,
   buildStructuredPMUserPrompt,
 } from "@/core/agents";
