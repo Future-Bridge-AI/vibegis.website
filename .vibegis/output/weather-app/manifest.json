@@ -1,0 +1,23 @@
+{
+  "name": "weather-app",
+  "label": "Weather Viewer",
+  "type": "widget",
+  "version": "1.0.0",
+  "exbVersion": "1.19.0",
+  "author": "VibeGIS",
+  "description": "Display current weather conditions, forecasts, and weather alerts for map locations. Users click on the map to get weather information for specific locations.",
+  "copyright": "",
+  "license": "Apache-2.0",
+  "properties": {
+    "canCreateMapView": false,
+    "hasVersionManager": false
+  },
+  "translatedLocales": ["en"],
+  "defaultLocale": "en",
+  "publishMessages": [
+    "EXTENT_CHANGE",
+    "DATA_RECORD_SET_CHANGE"
+  ],
+  "messageActions": [],
+  "dependency": "jimu-arcgis"
+}
