@@ -1,10 +1,11 @@
 /**
  * AI Configuration Panel
  * Collapsible panel for configuring AI provider settings
+ * Blueprint design aesthetic
  */
 
 import { useState } from "react";
-import { ChevronDown, ChevronUp, Key, Bot, Check, X } from "lucide-react";
+import { ChevronDown, ChevronUp, Key, Bot, Check, X, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useWorkflowStore } from "./store";
 import type { AIProvider } from "@/lib/ai/types";
@@ -32,7 +33,7 @@ export function AIConfigPanel() {
   const configureAI = useWorkflowStore((state) => state.configureAI);
   const clearAIConfig = useWorkflowStore((state) => state.clearAIConfig);
 
-  const selectedProvider = providers.find((p) => p.id === aiProvider) ?? providers[0];
+  const selectedProvider = providers.find((p) => p.id === aiProvider) ?? providers[0]!;
 
   const handleConfigure = () => {
     if (apiKeyInput.trim()) {
@@ -48,7 +49,7 @@ export function AIConfigPanel() {
   };
 
   return (
-    <div className="rounded-2xl border border-wizard-border bg-geodark-secondary/40">
+    <div className="rounded-lg border border-border bg-white shadow-card">
       {/* Header - Always visible */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
@@ -57,19 +58,19 @@ export function AIConfigPanel() {
         <div className="flex items-center gap-3">
           <div
             className={cn(
-              "flex h-8 w-8 items-center justify-center rounded-lg",
+              "flex h-8 w-8 items-center justify-center rounded-md border",
               aiConfigured
-                ? "bg-fiesta-turquoise/20 text-fiesta-turquoise"
-                : "bg-fiesta-orange/20 text-fiesta-orange"
+                ? "border-emerald-300 bg-emerald-50 text-emerald-600"
+                : "border-amber-300 bg-amber-50 text-amber-600"
             )}
           >
             {aiConfigured ? <Check className="h-4 w-4" /> : <Key className="h-4 w-4" />}
           </div>
           <div className="text-left">
-            <p className="font-mono text-sm font-semibold text-gray-200">
+            <p className="text-sm font-semibold text-ink">
               {aiConfigured ? "AI Connected" : "Configure AI"}
             </p>
-            <p className="font-mono text-xs text-gray-500">
+            <p className="font-mono text-xs text-ink-faint">
               {aiConfigured
                 ? `${selectedProvider.label} • ${aiModel.split("/").pop()}`
                 : "Add your API key to enable AI features"}
@@ -77,28 +78,28 @@ export function AIConfigPanel() {
           </div>
         </div>
         {isExpanded ? (
-          <ChevronUp className="h-4 w-4 text-gray-500" />
+          <ChevronUp className="h-4 w-4 text-ink-faint" />
         ) : (
-          <ChevronDown className="h-4 w-4 text-gray-500" />
+          <ChevronDown className="h-4 w-4 text-ink-faint" />
         )}
       </button>
 
       {/* Expanded Content */}
       {isExpanded && (
-        <div className="border-t border-wizard-border/50 px-4 py-4 space-y-4">
+        <div className="border-t border-border px-4 py-4 space-y-4">
           {aiConfigured ? (
             <>
               {/* Connected State */}
-              <div className="flex items-center justify-between rounded-lg border border-fiesta-turquoise/30 bg-fiesta-turquoise/10 px-3 py-2">
+              <div className="flex items-center justify-between rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2">
                 <div className="flex items-center gap-2">
-                  <Bot className="h-4 w-4 text-fiesta-turquoise" />
-                  <span className="font-mono text-xs text-fiesta-turquoise">
+                  <Bot className="h-4 w-4 text-emerald-600" />
+                  <span className="font-mono text-xs text-emerald-700">
                     Ready to chat
                   </span>
                 </div>
                 <button
                   onClick={handleClear}
-                  className="flex items-center gap-1 rounded px-2 py-1 font-mono text-xs text-gray-400 transition hover:text-fiesta-pink"
+                  className="flex items-center gap-1 rounded px-2 py-1 font-mono text-xs text-ink-faint transition hover:text-accent-red"
                 >
                   <X className="h-3 w-3" />
                   Disconnect
@@ -107,13 +108,13 @@ export function AIConfigPanel() {
 
               {/* Model Selector */}
               <div className="space-y-2">
-                <label className="font-mono text-xs font-semibold text-gray-400">
+                <label className="input-label">
                   Model
                 </label>
                 <select
                   value={aiModel}
                   onChange={(e) => configureAI(aiProvider, "", e.target.value)}
-                  className="wizard-input w-full text-sm"
+                  className="input"
                 >
                   {selectedProvider.models.map((model) => (
                     <option key={model} value={model}>
@@ -127,7 +128,7 @@ export function AIConfigPanel() {
             <>
               {/* API Key Input */}
               <div className="space-y-2">
-                <label className="font-mono text-xs font-semibold text-gray-400">
+                <label className="input-label">
                   OpenRouter API Key
                 </label>
                 <input
@@ -135,24 +136,25 @@ export function AIConfigPanel() {
                   value={apiKeyInput}
                   onChange={(e) => setApiKeyInput(e.target.value)}
                   placeholder="sk-or-..."
-                  className="wizard-input w-full text-sm"
+                  className="input"
                 />
-                <p className="font-mono text-xs text-gray-600">
+                <p className="input-helper flex items-center gap-1">
                   Get your key at{" "}
                   <a
                     href="https://openrouter.ai/keys"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-fiesta-turquoise hover:underline"
+                    className="inline-flex items-center gap-1 text-accent-blue hover:underline"
                   >
                     openrouter.ai/keys
+                    <ExternalLink className="h-3 w-3" />
                   </a>
                 </p>
               </div>
 
               {/* Model Selector */}
               <div className="space-y-2">
-                <label className="font-mono text-xs font-semibold text-gray-400">
+                <label className="input-label">
                   Model
                 </label>
                 <select
@@ -160,7 +162,7 @@ export function AIConfigPanel() {
                   onChange={(e) =>
                     useWorkflowStore.setState({ aiModel: e.target.value })
                   }
-                  className="wizard-input w-full text-sm"
+                  className="input"
                 >
                   {selectedProvider.models.map((model) => (
                     <option key={model} value={model}>
@@ -174,7 +176,7 @@ export function AIConfigPanel() {
               <button
                 onClick={handleConfigure}
                 disabled={!apiKeyInput.trim()}
-                className="w-full rounded-xl bg-fiesta-turquoise py-2.5 font-mono text-sm font-bold text-geodark transition hover:bg-fiesta-turquoise/90 hover:shadow-wizard-glow disabled:cursor-not-allowed disabled:opacity-50"
+                className="btn-primary w-full disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Connect
               </button>

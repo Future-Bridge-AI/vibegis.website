@@ -1,12 +1,15 @@
 import type { LucideIcon } from "lucide-react";
+import { Check } from "lucide-react";
 
 import { WorkflowPhase } from "@/features/workflow/types";
+import { cn } from "@/lib/utils";
 
 type StepDefinition = {
   phase: WorkflowPhase;
   label: string;
   description: string;
   Icon: LucideIcon;
+  spec?: string;
 };
 
 type StepIndicatorProps = {
@@ -23,35 +26,55 @@ const StepIndicator = ({ steps, currentPhase }: StepIndicatorProps) => {
         {steps.map((step, index) => {
           const isCompleted = index < currentIndex;
           const isCurrent = index === currentIndex;
+          const stepNumber = String(index + 1).padStart(2, '0');
 
           return (
             <div
               key={step.phase}
-              className={`rounded-2xl border px-4 py-5 transition duration-200 ${
-                isCurrent
-                  ? "border-fiesta-turquoise/60 bg-geodark-secondary/80 shadow-lg shadow-fiesta-turquoise/10"
-                  : isCompleted
-                    ? "border-emerald-400/50 bg-geodark-secondary/50"
-                    : "border-wizard-border bg-geodark"
-              }`}
+              className={cn(
+                "relative rounded-lg border bg-white px-4 py-4 transition-all duration-200",
+                isCurrent && "border-accent-blue shadow-card ring-2 ring-accent-blue/10",
+                isCompleted && "border-emerald-300 bg-emerald-50/50",
+                !isCurrent && !isCompleted && "border-border"
+              )}
             >
-              <div className="flex items-center gap-3">
-                <span
-                  className={`flex h-10 w-10 items-center justify-center rounded-full border text-base ${
-                    isCurrent
-                      ? "border-fiesta-turquoise/60 bg-fiesta-turquoise/10 text-fiesta-turquoise"
-                      : isCompleted
-                        ? "border-emerald-400/60 bg-emerald-500/10 text-emerald-200"
-                        : "border-wizard-border bg-geodark-secondary text-gray-500"
-                  }`}
-                >
-                  <step.Icon className="h-5 w-5" />
+              {/* Spec label */}
+              {step.spec && (
+                <span className="absolute -top-2 left-3 bg-paper px-1 font-mono text-[10px] text-ink-faint">
+                  {step.spec}
                 </span>
-                <div>
-                  <p className="font-sans text-sm font-bold text-gray-100">
+              )}
+
+              <div className="flex items-center gap-3">
+                {/* Step Number / Icon */}
+                <span
+                  className={cn(
+                    "flex h-9 w-9 items-center justify-center rounded-md border text-sm font-medium",
+                    isCurrent && "border-accent-blue bg-accent-blue text-white",
+                    isCompleted && "border-emerald-400 bg-emerald-500 text-white",
+                    !isCurrent && !isCompleted && "border-border bg-paper text-ink-faint"
+                  )}
+                >
+                  {isCompleted ? (
+                    <Check className="h-4 w-4" />
+                  ) : (
+                    <span className="font-mono">{stepNumber}</span>
+                  )}
+                </span>
+
+                {/* Step Info */}
+                <div className="flex-1 min-w-0">
+                  <p className={cn(
+                    "text-sm font-semibold",
+                    isCurrent && "text-ink",
+                    isCompleted && "text-emerald-700",
+                    !isCurrent && !isCompleted && "text-ink-light"
+                  )}>
                     {step.label}
                   </p>
-                  <p className="font-mono text-xs text-gray-500">{step.description}</p>
+                  <p className="font-mono text-xs text-ink-faint truncate">
+                    {step.description}
+                  </p>
                 </div>
               </div>
             </div>

@@ -1,6 +1,6 @@
 /**
  * Chat Input Component
- * Text input for chat messages with GeoPunk styling
+ * Text input for chat messages with Blueprint styling
  */
 
 import { Send, Loader2 } from "lucide-react";
@@ -66,7 +66,7 @@ export function ChatInput({
               type="button"
               onClick={() => handleSuggestionClick(suggestion)}
               disabled={disabled}
-              className="rounded-full border border-wizard-border bg-geodark-secondary/60 px-3 py-1.5 font-mono text-xs text-gray-400 transition hover:border-fiesta-turquoise/50 hover:text-fiesta-turquoise disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-md border border-border bg-white px-3 py-1.5 font-mono text-xs text-ink-light transition hover:border-accent-blue hover:text-accent-blue disabled:cursor-not-allowed disabled:opacity-50"
             >
               {suggestion}
             </button>
@@ -76,7 +76,7 @@ export function ChatInput({
 
       {/* Input Form */}
       <form onSubmit={handleSubmit} className="relative">
-        <div className="flex items-end gap-2 rounded-2xl border border-wizard-border bg-geodark-secondary/60 p-2 focus-within:border-fiesta-turquoise/50 transition">
+        <div className="flex items-end gap-2 rounded-lg border border-border bg-white p-2 focus-within:border-accent-blue focus-within:ring-1 focus-within:ring-accent-blue/20 transition">
           <textarea
             ref={textareaRef}
             value={message}
@@ -86,8 +86,8 @@ export function ChatInput({
             disabled={disabled || isStreaming}
             rows={1}
             className={cn(
-              "flex-1 resize-none bg-transparent px-2 py-1 font-mono text-sm text-gray-200",
-              "placeholder:text-gray-600 focus:outline-none",
+              "flex-1 resize-none bg-transparent px-2 py-1.5 font-mono text-sm text-ink",
+              "placeholder:text-ink-muted focus:outline-none",
               "disabled:cursor-not-allowed disabled:opacity-50"
             )}
           />
@@ -95,10 +95,10 @@ export function ChatInput({
             type="submit"
             disabled={disabled || isStreaming || !message.trim()}
             className={cn(
-              "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition",
-              "bg-fiesta-turquoise text-geodark",
-              "hover:bg-fiesta-turquoise/90 hover:shadow-wizard-glow",
-              "disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:shadow-none"
+              "flex h-8 w-8 shrink-0 items-center justify-center rounded-md transition",
+              "bg-accent-blue text-white",
+              "hover:bg-accent-blue-dark",
+              "disabled:cursor-not-allowed disabled:opacity-50"
             )}
           >
             {isStreaming ? (
@@ -111,8 +111,9 @@ export function ChatInput({
 
         {/* Streaming indicator */}
         {isStreaming && (
-          <div className="absolute -bottom-6 left-0 flex items-center gap-2 text-xs text-gray-500">
-            <span className="animate-pulse">AI is thinking...</span>
+          <div className="absolute -bottom-6 left-0 flex items-center gap-2 text-xs text-ink-faint">
+            <Loader2 className="h-3 w-3 animate-spin" />
+            <span>AI is thinking...</span>
           </div>
         )}
       </form>

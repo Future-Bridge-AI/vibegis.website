@@ -1,9 +1,11 @@
 /**
  * Artifact Panel Component
  * Right-side panel displaying phase-specific artifacts
+ * Blueprint design aesthetic
  */
 
 import { type ReactNode } from "react";
+import { FileText, Loader2, CheckCircle, PenLine } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { ArtifactStatus } from "../types";
 
@@ -25,38 +27,56 @@ export function ArtifactPanel({
   return (
     <div className="flex h-full flex-col">
       {/* Header */}
-      <div className="border-b border-wizard-border/50 bg-geodark-secondary/30 px-4 py-3">
+      <div className="border-b border-border bg-white px-4 py-3">
         <div className="flex items-center justify-between">
-          <div>
-            <h3 className="font-sans text-lg font-bold text-gray-100">
-              {title}
-            </h3>
-            <p className="font-mono text-xs text-gray-500">{description}</p>
+          <div className="flex items-center gap-3">
+            <div className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-paper">
+              <FileText className="h-4 w-4 text-ink-faint" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-ink">
+                {title}
+              </h3>
+              <p className="font-mono text-xs text-ink-faint">{description}</p>
+            </div>
           </div>
           <div className="flex items-center gap-2">
             {/* Status Badge */}
             <span
               className={cn(
-                "rounded-full px-2 py-1 font-mono text-xs",
-                status === "empty" && "bg-gray-700/50 text-gray-500",
-                status === "building" &&
-                  "bg-fiesta-orange/20 text-fiesta-orange animate-pulse",
-                status === "complete" &&
-                  "bg-fiesta-turquoise/20 text-fiesta-turquoise",
-                status === "editing" && "bg-fiesta-pink/20 text-fiesta-pink"
+                "stamp",
+                status === "empty" && "stamp-default",
+                status === "building" && "stamp-blue animate-pulse",
+                status === "complete" && "stamp-success",
+                status === "editing" && "stamp-red"
               )}
             >
               {status === "empty" && "Empty"}
-              {status === "building" && "Building..."}
-              {status === "complete" && "Complete"}
-              {status === "editing" && "Editing"}
+              {status === "building" && (
+                <>
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                  Building
+                </>
+              )}
+              {status === "complete" && (
+                <>
+                  <CheckCircle className="h-3 w-3" />
+                  Complete
+                </>
+              )}
+              {status === "editing" && (
+                <>
+                  <PenLine className="h-3 w-3" />
+                  Editing
+                </>
+              )}
             </span>
 
             {/* Edit Button */}
             {status === "complete" && onEdit && (
               <button
                 onClick={onEdit}
-                className="rounded-lg border border-wizard-border px-2 py-1 font-mono text-xs text-gray-400 transition hover:border-fiesta-turquoise/50 hover:text-fiesta-turquoise"
+                className="btn-ghost text-xs"
               >
                 Edit
               </button>

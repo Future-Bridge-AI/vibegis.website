@@ -1,66 +1,337 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Instrument+Serif:ital@0;1&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================
+   VIBEGIS DESIGN SYSTEM
+   Paper / Blueprint / Field Notebook aesthetic
+   ============================================ */
+
 @layer base {
+  :root {
+    /* Paper palette */
+    --paper: #f5f3ef;
+    --paper-warm: #f9f7f3;
+    --paper-lines: #e8e4dd;
+    --paper-dark: #eae6df;
+
+    /* Ink palette */
+    --ink: #1a1a1a;
+    --ink-soft: #3d3d3d;
+    --ink-faded: #6b6b6b;
+    --ink-ghost: #9a9a9a;
+
+    /* Accent palette */
+    --pencil: #2b5797;
+    --pencil-light: rgba(43, 87, 151, 0.12);
+    --pencil-mid: rgba(43, 87, 151, 0.25);
+    --redline: #c94a4a;
+    --redline-light: rgba(201, 74, 74, 0.12);
+    --highlight: #f7e576;
+    --highlight-light: rgba(247, 229, 118, 0.4);
+    --success: #4a9c6d;
+    --border: #d4d0c8;
+
+    /* Typography */
+    --mono: 'IBM Plex Mono', monospace;
+    --handwritten: 'Caveat', cursive;
+    --serif: 'Instrument Serif', serif;
+
+    /* Spacing */
+    --space-xs: 0.5rem;
+    --space-sm: 1rem;
+    --space-md: 1.5rem;
+    --space-lg: 3rem;
+    --space-xl: 4.5rem;
+  }
+
   * {
-    @apply font-sans;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
   }
 
   body {
-    background-color: #0a0e17;
-    @apply text-gray-100 antialiased;
-  }
-}
-
-@layer utilities {
-  /* Animated grid background */
-  .bg-grid-animated {
-    background-image: 
-      linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
-    background-size: 50px 50px;
+    font-family: var(--mono);
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.7;
+    font-size: 14px;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Neon glow effects */
-  .glow-cyan {
-    box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
-  }
-
-  .glow-cyan-lg {
-    box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
-  }
-
-  .glow-cyan-xl {
-    box-shadow: 0 0 40px rgba(0, 255, 255, 0.6);
-  }
-
-  .glow-purple {
-    box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
-  }
-
-  /* Wizard form utilities */
-  .wizard-input {
-    @apply rounded-xl border border-wizard-border bg-wizard-card/80 px-4 py-3 text-sm text-slate-100 placeholder:text-slate-500 focus:border-fiesta-turquoise/70 focus:outline-none;
-  }
-
-  .wizard-card {
-    @apply rounded-2xl border border-wizard-border bg-wizard-card/60 p-6;
-  }
-
-  .wizard-section-title {
-    @apply text-xs font-semibold uppercase tracking-[0.3em] text-fiesta-turquoise;
+  /* Focus states for accessibility */
+  :focus-visible {
+    outline: 2px solid var(--pencil);
+    outline-offset: 2px;
   }
 }
 
 @layer components {
-  /* Custom animations */
+  /* ========================
+     PAPER BACKGROUNDS
+     ======================== */
+  .paper-grid {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+      linear-gradient(var(--paper-lines) 1px, transparent 1px),
+      linear-gradient(90deg, var(--paper-lines) 1px, transparent 1px);
+    background-size: 24px 24px;
+    opacity: 0.45;
+  }
+
+  @media (max-width: 768px) {
+    .paper-grid {
+      opacity: 0.2;
+      background-size: 32px 32px;
+    }
+  }
+
+  .paper-texture {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.25;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* ========================
+     SECTION LABELS
+     ======================== */
+  .sec-label {
+    font-size: 0.6rem;
+    color: var(--ink-ghost);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: var(--space-xs);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+  }
+
+  .sec-label::before {
+    content: '';
+    width: 12px;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .sec-title {
+    font-family: var(--serif);
+    font-size: clamp(1.4rem, 3.5vw, 1.85rem);
+    font-weight: 400;
+    line-height: 1.15;
+    margin-bottom: var(--space-sm);
+  }
+
+  .sec-title em {
+    font-style: italic;
+    color: var(--pencil);
+  }
+
+  .sec-lead {
+    font-size: 0.88rem;
+    color: var(--ink-soft);
+    max-width: 60ch;
+    line-height: 1.8;
+  }
+
+  .sec-lead b,
+  .highlight-text {
+    color: var(--ink);
+    background: var(--highlight-light);
+    padding: 0 3px;
+  }
+
+  /* ========================
+     BUTTONS
+     ======================== */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 16px;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-decoration: none;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn:focus-visible {
+    outline: 2px solid var(--pencil);
+    outline-offset: 2px;
+  }
+
+  .btn-primary {
+    background: var(--pencil);
+    color: white;
+    border-color: var(--pencil);
+  }
+
+  .btn-primary:hover {
+    background: var(--ink);
+    border-color: var(--ink);
+    transform: translateY(-2px);
+  }
+
+  .btn-secondary {
+    background: var(--paper);
+    color: var(--ink);
+    border-color: var(--border);
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--pencil);
+    color: var(--pencil);
+  }
+
+  .btn-redline {
+    background: var(--redline);
+    color: white;
+    border-color: var(--redline);
+  }
+
+  .btn-redline:hover {
+    background: var(--ink);
+    border-color: var(--ink);
+    transform: translateY(-2px);
+  }
+
+  /* ========================
+     CARDS
+     ======================== */
+  .card {
+    background: var(--paper);
+    border: 1px solid var(--border);
+    transition: all 0.15s;
+  }
+
+  .card:hover {
+    background: var(--paper-warm);
+  }
+
+  .card-featured {
+    border: 2px solid var(--pencil);
+    box-shadow: 4px 4px 0 var(--pencil-light);
+  }
+
+  /* ========================
+     PRODUCT BADGES
+     ======================== */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .badge-live {
+    background: var(--success);
+    color: white;
+  }
+
+  .badge-coming {
+    background: var(--pencil-light);
+    color: var(--pencil);
+    border: 1px dashed var(--pencil);
+  }
+
+  .badge-redline {
+    background: var(--redline);
+    color: white;
+    font-family: var(--handwritten);
+    font-size: 0.82rem;
+    transform: rotate(2deg);
+  }
+
+  /* ========================
+     FORM INPUTS
+     ======================== */
+  .input {
+    width: 100%;
+    padding: 10px 12px;
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    background: var(--paper);
+    border: 1px solid var(--border);
+    color: var(--ink);
+    transition: border-color 0.15s;
+  }
+
+  .input:focus {
+    outline: none;
+    border-color: var(--pencil);
+  }
+
+  .input::placeholder {
+    color: var(--ink-ghost);
+  }
+
+  /* ========================
+     HANDWRITTEN ELEMENTS
+     ======================== */
+  .handwritten {
+    font-family: var(--handwritten);
+  }
+
+  .handwritten-num {
+    font-family: var(--handwritten);
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--paper-lines);
+    line-height: 1;
+  }
+
+  /* ========================
+     PRINCIPLE BOX
+     ======================== */
+  .principle-box {
+    padding: var(--space-sm);
+    background: var(--pencil-light);
+    border-left: 3px solid var(--pencil);
+  }
+
+  .principle-box p {
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+  }
+
+  .principle-box strong {
+    color: var(--pencil);
+  }
+
+  /* ========================
+     ANIMATIONS
+     ======================== */
+  .animate-fade-in-up {
+    animation: fadeInUp 0.4s ease-out;
+  }
+
   @keyframes fadeInUp {
     from {
       opacity: 0;
-      transform: translateY(30px);
+      transform: translateY(10px);
     }
     to {
       opacity: 1;
@@ -68,20 +339,151 @@
     }
   }
 
-  @keyframes ping {
-    0%, 100% {
-      opacity: 0;
-    }
-    50% {
-      opacity: 0.5;
+  /* ========================
+     FAQ ACCORDION
+     ======================== */
+  .faq-item {
+    background: var(--paper);
+    border: 1px solid var(--border);
+  }
+
+  .faq-question {
+    width: 100%;
+    padding: var(--space-sm);
+    background: none;
+    border: none;
+    text-align: left;
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--ink);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: color 0.15s;
+  }
+
+  .faq-question:hover {
+    color: var(--pencil);
+  }
+
+  .faq-question::after {
+    content: '+';
+    font-family: var(--handwritten);
+    font-size: 1.4rem;
+    color: var(--pencil);
+    transition: transform 0.2s;
+  }
+
+  .faq-item.open .faq-question::after {
+    transform: rotate(45deg);
+  }
+
+  .faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.25s ease-out;
+  }
+
+  .faq-item.open .faq-answer {
+    max-height: 400px;
+  }
+
+  .faq-answer-inner {
+    padding: 0 var(--space-sm) var(--space-sm);
+    font-size: 0.82rem;
+    color: var(--ink-faded);
+    line-height: 1.8;
+  }
+
+  /* ========================
+     SKIP LINK (A11y)
+     ======================== */
+  .skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: var(--pencil);
+    color: white;
+    padding: 8px 16px;
+    z-index: 9999;
+    text-decoration: none;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+  }
+
+  .skip-link:focus {
+    top: 0;
+  }
+
+  /* ========================
+     DRAFT STAMP
+     ======================== */
+  .draft-stamp {
+    position: fixed;
+    top: 85px;
+    right: 20px;
+    transform: rotate(12deg);
+    z-index: 100;
+    pointer-events: none;
+  }
+
+  .draft-stamp-inner {
+    border: 3px solid var(--redline);
+    padding: 0.3rem 0.9rem;
+    font-family: var(--mono);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--redline);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    opacity: 0.4;
+    background: var(--paper);
+  }
+
+  @media (max-width: 768px) {
+    .draft-stamp {
+      display: none;
     }
   }
 
-  .animate-fade-in-up {
-    animation: fadeInUp 0.6s ease-out;
+  /* ========================
+     LEGACY WIZARD SUPPORT
+     ======================== */
+  .wizard-input {
+    @apply input;
   }
 
-  .animate-ping-slow {
-    animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+  .wizard-card {
+    @apply card;
+    padding: var(--space-md);
+  }
+
+  .wizard-section-title {
+    @apply sec-label;
+    color: var(--pencil);
+  }
+}
+
+@layer utilities {
+  .section-alt {
+    background: var(--paper-warm);
+  }
+
+  .text-pencil {
+    color: var(--pencil);
+  }
+
+  .text-redline {
+    color: var(--redline);
+  }
+
+  .bg-pencil-light {
+    background: var(--pencil-light);
+  }
+
+  .border-pencil {
+    border-color: var(--pencil);
   }
 }
