@@ -166,25 +166,39 @@ export function formatCohortDateRange(startDate: Date, endDate: Date): string {
   return `${startMonth} ${startDay} - ${endMonth} ${endDay}`;
 }
 
-// Get available seats (simulated - in production this comes from database)
-export function getAvailableSeats(cohortId: string): number {
-  // Check localStorage for demo purposes
-  const booked = localStorage.getItem(`cohort_seats_${cohortId}`);
-  const bookedCount = booked ? parseInt(booked, 10) : 0;
-  return Math.max(0, 10 - bookedCount);
-}
+// Seat counts fetched from Supabase (cohort_seat_counts view)
+// Returns a map of cohort stripeValue -> booked seats
+import { supabase, isSupabaseConfigured } from './supabase';
 
-// Simulate booking seats (for demo)
-export function bookSeats(cohortId: string, count: number): boolean {
-  const available = getAvailableSeats(cohortId);
-  if (count > available) {
-    return false;
+export async function fetchCohortSeatCounts(): Promise<Record<string, number>> {
+  if (!isSupabaseConfigured()) {
+    return {};
   }
 
-  const current = localStorage.getItem(`cohort_seats_${cohortId}`);
-  const currentCount = current ? parseInt(current, 10) : 0;
-  localStorage.setItem(`cohort_seats_${cohortId}`, String(currentCount + count));
-  return true;
+  const { data, error } = await supabase
+    .from('cohort_seat_counts')
+    .select('cohort_label, booked_seats')
+    .returns<{ cohort_label: string; booked_seats: number }[]>();
+
+  if (error) {
+    console.error('Failed to fetch seat counts:', error);
+    return {};
+  }
+
+  const counts: Record<string, number> = {};
+  for (const row of data ?? []) {
+    counts[row.cohort_label] = Number(row.booked_seats) || 0;
+  }
+  return counts;
+}
+
+// Get available seats for a specific cohort (sync helper using pre-fetched data)
+export function getAvailableSeats(
+  cohortStripeValue: string,
+  seatCounts: Record<string, number>
+): number {
+  const booked = seatCounts[cohortStripeValue] ?? 0;
+  return Math.max(0, 10 - booked);
 }
 
 /**

@@ -9,6 +9,9 @@ import { CheckCircle, Calendar, Mail, ArrowRight, BookOpen } from 'lucide-react'
 
 export default function TrainingSuccess() {
   const [showConfetti, setShowConfetti] = useState(true);
+  const [enrollmentEmail] = useState(() => sessionStorage.getItem('vibegis_enrollment_email') || '');
+  const [enrollmentCohort] = useState(() => sessionStorage.getItem('vibegis_enrollment_cohort') || '');
+  const [enrollmentTier] = useState(() => sessionStorage.getItem('vibegis_enrollment_tier') || '');
 
   useEffect(() => {
     // Hide confetti after animation
@@ -72,7 +75,14 @@ export default function TrainingSuccess() {
               className="text-xl text-[#1e3a5f]/70 mb-8"
               style={{ fontFamily: "'IBM Plex Mono', monospace" }}
             >
-              Welcome to the VibeGIS Training cohort
+              {enrollmentCohort
+                ? `Welcome to VibeGIS Training \u2014 ${enrollmentCohort}`
+                : 'Welcome to the VibeGIS Training cohort'}
+              {enrollmentTier && (
+                <span className="block text-sm mt-2 text-[#1e3a5f]/50">
+                  {enrollmentTier} Plan
+                </span>
+              )}
             </p>
 
             {/* What Happens Next */}
@@ -146,7 +156,9 @@ export default function TrainingSuccess() {
             className="text-center text-[#1e3a5f]/50 mt-8 text-sm"
             style={{ fontFamily: "'IBM Plex Mono', monospace" }}
           >
-            A receipt has been sent to your email address.
+            {enrollmentEmail
+              ? `A receipt has been sent to ${enrollmentEmail}.`
+              : 'A receipt has been sent to your email address.'}
           </p>
         </div>
       </div>

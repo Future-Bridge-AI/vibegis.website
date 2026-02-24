@@ -19,7 +19,7 @@ import {
   Terminal,
 } from 'lucide-react';
 import { EnrollmentModal } from './EnrollmentModal';
-import { generateCohorts, formatCohortDate, getAvailableSeats, type Cohort } from '@/lib/cohorts';
+import { generateCohorts, formatCohortDate, getAvailableSeats, fetchCohortSeatCounts, type Cohort } from '@/lib/cohorts';
 
 // ============================================
 // TYPES
@@ -49,10 +49,12 @@ export default function LandingPage() {
   const [cohorts, setCohorts] = useState<Cohort[]>([]);
   const [isEnrollmentOpen, setIsEnrollmentOpen] = useState(false);
   const [selectedTier, setSelectedTier] = useState<string | undefined>(undefined);
+  const [seatCounts, setSeatCounts] = useState<Record<string, number>>({});
 
-  // Load cohorts
+  // Load cohorts and seat counts
   useEffect(() => {
     setCohorts(generateCohorts(6));
+    fetchCohortSeatCounts().then(setSeatCounts);
   }, []);
 
   // Get the next available cohort
@@ -60,7 +62,7 @@ export default function LandingPage() {
   const nextCohortDate = nextCohort
     ? `${formatCohortDate(nextCohort.startDate)} • 8:00 AM AWST`
     : 'Loading...';
-  const nextCohortSeats = nextCohort ? getAvailableSeats(nextCohort.id) : 10;
+  const nextCohortSeats = nextCohort ? getAvailableSeats(nextCohort.stripeValue, seatCounts) : 10;
 
   const handleFaqToggle = (index: number) => {
     track('faq_open', { index });

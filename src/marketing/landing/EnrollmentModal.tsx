@@ -18,6 +18,7 @@ import {
   generateCohorts,
   formatCohortDate,
   getAvailableSeats,
+  fetchCohortSeatCounts,
   PRICING_TIERS,
   buildStripeCheckoutUrl,
   type Cohort,
@@ -47,10 +48,12 @@ export function EnrollmentModal({ isOpen, onClose, initialTier }: EnrollmentModa
   const [cohorts, setCohorts] = useState<Cohort[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState('');
+  const [seatCounts, setSeatCounts] = useState<Record<string, number>>({});
 
-  // Load cohorts on mount
+  // Load cohorts and seat counts on mount
   useEffect(() => {
     setCohorts(generateCohorts(6));
+    fetchCohortSeatCounts().then(setSeatCounts);
   }, []);
 
   // Reset when modal opens
@@ -133,6 +136,11 @@ Thanks!
 
     // Build Stripe Payment Link URL with prefilled cohort and email
     const checkoutUrl = buildStripeCheckoutUrl(selectedTier, selectedCohort, email || undefined);
+
+    // Save enrollment context for the success page
+    if (email) sessionStorage.setItem('vibegis_enrollment_email', email);
+    sessionStorage.setItem('vibegis_enrollment_cohort', selectedCohort.label);
+    sessionStorage.setItem('vibegis_enrollment_tier', selectedTier.name);
 
     // Redirect to Stripe
     setTimeout(() => {
@@ -248,8 +256,8 @@ Thanks!
           {step === 'cohort' && (
             <div className="space-y-3">
               {cohorts.map((cohort) => {
-                const availableSeats = getAvailableSeats(cohort.id);
-                const isAvailable = cohort.status !== 'started' && cohort.status !== 'full';
+                const availableSeats = getAvailableSeats(cohort.stripeValue, seatCounts);
+                const isAvailable = cohort.status !== 'started' && cohort.status !== 'full' && availableSeats > 0;
                 const isSelected = selectedCohort?.id === cohort.id;
 
                 return (
